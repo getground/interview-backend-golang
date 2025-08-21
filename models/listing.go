@@ -9,47 +9,78 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Region represents valid UK regions
+type Region string
+
+const (
+	RegionNorthWest Region = "North West"
+	RegionLondon    Region = "London"
+	RegionNorthEast Region = "North East"
+	RegionSouthWest Region = "South West"
+	RegionSouthEast Region = "South East"
+	RegionMidlands  Region = "Midlands"
+	RegionScotland  Region = "Scotland"
+	RegionWales     Region = "Wales"
+)
+
+// PropertyType represents valid property types
+type PropertyType string
+
+const (
+	PropertyTypeApartment    PropertyType = "apartment"
+	PropertyTypeDetached     PropertyType = "detached"
+	PropertyTypeSemiDetached PropertyType = "semi-detached"
+	PropertyTypeTerraced     PropertyType = "terraced"
+	PropertyTypeEndTerrace   PropertyType = "end-terrace"
+)
+
+// AddressDetails represents the address information for a listing
+type AddressDetails struct {
+	AddressLine1      string `json:"addressLine1"`
+	AddressLine2      string `json:"addressLine2"`
+	City              string `json:"city"`
+	Postcode          string `json:"postcode"`
+	ShortenedPostcode string `json:"shortenedPostcode"`
+	Country           string `json:"country"`
+	Region            Region `json:"region"`
+}
+
+// Photo represents a property photo
+type Photo struct {
+	OriginalURL  string `json:"originalURL"`
+	StandardURL  string `json:"standardURL"`
+	ThumbnailURL string `json:"thumbnailURL"`
+	MimeType     string `json:"mimeType"`
+}
+
+// Listing represents a property listing
+type Listing struct {
+	ID                         int64          `json:"id"`
+	AddressDetails             AddressDetails `json:"addressDetails"`
+	Bedrooms                   int            `json:"bedrooms"`
+	Bathrooms                  int            `json:"bathrooms"`
+	Description                string         `json:"description"`
+	GrossYield                 float64        `json:"grossYield"`
+	IsCashOnly                 bool           `json:"isCashOnly"`
+	IsCompany                  bool           `json:"isCompany"`
+	IsNewBuild                 bool           `json:"isNewBuild"`
+	IsShareSale                bool           `json:"isShareSale"`
+	IsTenanted                 bool           `json:"isTenanted"`
+	MadeVisibleAt              *string        `json:"madeVisibleAt"`
+	EstimatedDepositInCents    int64          `json:"estimatedDepositInCents"`
+	MinimumDepositInCents      int64          `json:"minimumDepositInCents"`
+	Photos                     []Photo        `json:"photos"`
+	PriceInCents               int64          `json:"priceInCents"`
+	PropertyType               PropertyType   `json:"propertyType"`
+	MonthlyRentalIncomeInCents int64          `json:"monthlyRentalIncomeInCents"`
+	SizeSqFt                   int            `json:"sizeSqFt"`
+}
+
 // ListingResponse represents the top-level response structure
 type ListingResponse struct {
 	Type        string       `json:"type"`
 	Listing     *Listing     `json:"listing"`
 	Development *Development `json:"development"`
-}
-
-// Listing represents a property listing
-type Listing struct {
-	ID                      int64   `json:"id"`
-	DevelopmentName         *string `json:"development_name"`
-	PostTown                string  `json:"post_town"`
-	ShortenedPostCode       string  `json:"shortened_post_code"`
-	Region                  string  `json:"region"`
-	PropertyType            string  `json:"property_type"`
-	Bedrooms                int     `json:"bedrooms"`
-	Bathrooms               int     `json:"bathrooms"`
-	SizeSqFt                int     `json:"size_sq_ft"`
-	PriceInCents            int64   `json:"price_in_cents"`
-	MinimumDepositInCents   int64   `json:"minimum_deposit_in_cents"`
-	EstimatedDepositInCents int64   `json:"estimated_deposit_in_cents"`
-	RentalIncomeInCents     int64   `json:"rental_income_in_cents"`
-	IsTenanted              bool    `json:"is_tenanted"`
-	IsCashOnly              bool    `json:"is_cash_only"`
-	Description             string  `json:"description"`
-	Photos                  []Photo `json:"photos"`
-	IsFeatured              bool    `json:"is_featured"`
-	GrossYield              float64 `json:"gross_yield"`
-	HasUserRequestedContact bool    `json:"has_user_requested_contact"`
-	HasUserSavedListing     bool    `json:"has_user_saved_listing"`
-	IsShareSale             bool    `json:"is_share_sale"`
-	IsGetgroundCompany      bool    `json:"is_getground_company"`
-	MadeVisibleAt           *string `json:"made_visible_at"`
-}
-
-// Photo represents a property photo
-type Photo struct {
-	OriginalURL  string `json:"original_url"`
-	StandardURL  string `json:"standard_url"`
-	ThumbnailURL string `json:"thumbnail_url"`
-	MimeType     string `json:"mime_type"`
 }
 
 // Development represents a property development (can be null)
@@ -98,22 +129,30 @@ func NewListingRepository() ListingRepository {
 func (r *ListingRepositoryImpl) addSampleData() {
 	sampleListings := []*Listing{
 		{
-			ID:                      187,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "N17",
-			Region:                  "South West",
-			PropertyType:            "apartment",
-			Bedrooms:                1,
-			Bathrooms:               1,
-			SizeSqFt:                50,
-			PriceInCents:            12500000,
-			MinimumDepositInCents:   1000000,
-			EstimatedDepositInCents: 3125000,
-			RentalIncomeInCents:     110000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "property",
+			ID: 187,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "5 Camden High Street",
+				AddressLine2:      "",
+				City:              "London",
+				Postcode:          "N1 7AA",
+				ShortenedPostcode: "N17",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  1,
+			SizeSqFt:                   50,
+			PriceInCents:               12500000,
+			MinimumDepositInCents:      1000000,
+			EstimatedDepositInCents:    3125000,
+			MonthlyRentalIncomeInCents: 110000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "property",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/1b2b53fd-398b-4129-8f7d-c5932f90b3c3",
@@ -128,31 +167,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.1056,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.1056,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      185,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W8",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                1,
-			Bathrooms:               1,
-			SizeSqFt:                2342,
-			PriceInCents:            10000000,
-			MinimumDepositInCents:   2550000,
-			EstimatedDepositInCents: 2500000,
-			RentalIncomeInCents:     300000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "asdf",
+			ID: 185,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "2B fire blvd",
+				AddressLine2:      "",
+				City:              "Ashford",
+				Postcode:          "",
+				ShortenedPostcode: "ASF",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  1,
+			SizeSqFt:                   2342,
+			PriceInCents:               10000000,
+			MinimumDepositInCents:      2550000,
+			EstimatedDepositInCents:    2500000,
+			MonthlyRentalIncomeInCents: 30000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "asdf",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/ba11810b-30fc-4061-b3f5-126e2aae0a95",
@@ -161,31 +203,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.36,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.036,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      79,
-			DevelopmentName:         nil,
-			PostTown:                "Wallington",
-			ShortenedPostCode:       "SM6",
-			Region:                  "London",
-			PropertyType:            "apartment",
-			Bedrooms:                2,
-			Bathrooms:               1,
-			SizeSqFt:                300,
-			PriceInCents:            10000000,
-			MinimumDepositInCents:   1000000,
-			EstimatedDepositInCents: 2500000,
-			RentalIncomeInCents:     60000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "test",
+			ID: 79,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "37 John Snow Drive",
+				AddressLine2:      "",
+				City:              "Wallington",
+				Postcode:          "SM6 4ER",
+				ShortenedPostcode: "SM6",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   2,
+			Bathrooms:                  1,
+			SizeSqFt:                   300,
+			PriceInCents:               10000000,
+			MinimumDepositInCents:      1000000,
+			EstimatedDepositInCents:    2500000,
+			MonthlyRentalIncomeInCents: 60000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/dc1c52ca-1061-4673-a3ae-92bd9098189d",
@@ -212,31 +257,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.072,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-02-01T16:42:09Z"),
+			GrossYield:    0.072,
+			MadeVisibleAt: stringPtr("2023-02-01T16:42:09Z"),
 		},
 		{
-			ID:                      80,
-			DevelopmentName:         nil,
-			PostTown:                "Edinburgh",
-			ShortenedPostCode:       "EH12",
-			Region:                  "Scotland",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                40,
-			PriceInCents:            23456700,
-			MinimumDepositInCents:   3000000,
-			EstimatedDepositInCents: 18798136,
-			RentalIncomeInCents:     200000,
-			IsTenanted:              true,
-			IsCashOnly:              true,
-			Description:             "Share Sale Test",
+			ID: 80,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "87 Scotts way",
+				AddressLine2:      "",
+				City:              "Edinburgh",
+				Postcode:          "EH12 5AA",
+				ShortenedPostcode: "EH12",
+				Country:           "UK",
+				Region:            RegionScotland,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   355,
+			PriceInCents:               23456700,
+			MinimumDepositInCents:      3000000,
+			EstimatedDepositInCents:    18798136,
+			MonthlyRentalIncomeInCents: 200000,
+			IsTenanted:                 true,
+			IsCashOnly:                 true,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                true,
+			Description:                "Share Sale Test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/32cdb9d4-f02e-4d4c-84a0-35318874c9c7",
@@ -251,31 +299,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.102316,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-02-01T16:52:50Z"),
+			GrossYield:    0.102316,
+			MadeVisibleAt: stringPtr("2023-02-01T16:52:50Z"),
 		},
 		{
-			ID:                      81,
-			DevelopmentName:         nil,
-			PostTown:                "Manchester",
-			ShortenedPostCode:       "M1",
-			Region:                  "North West",
-			PropertyType:            "semi_detached",
-			Bedrooms:                3,
-			Bathrooms:               2,
-			SizeSqFt:                40,
-			PriceInCents:            14400000,
-			MinimumDepositInCents:   5200000,
-			EstimatedDepositInCents: 3600000,
-			RentalIncomeInCents:     200000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "GG Company test",
+			ID: 81,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "202 Grunge street",
+				AddressLine2:      "",
+				City:              "Manchester",
+				Postcode:          "M1 1AA",
+				ShortenedPostcode: "M1",
+				Country:           "UK",
+				Region:            RegionNorthWest,
+			},
+			PropertyType:               PropertyTypeSemiDetached,
+			Bedrooms:                   3,
+			Bathrooms:                  2,
+			SizeSqFt:                   789,
+			PriceInCents:               14400000,
+			MinimumDepositInCents:      5200000,
+			EstimatedDepositInCents:    3600000,
+			MonthlyRentalIncomeInCents: 200000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  true,
+			IsShareSale:                true,
+			Description:                "GG Company test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/44e55a81-c66e-48b6-abef-9b8cb3a5b674",
@@ -290,32 +341,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.166667,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      true,
-			MadeVisibleAt:           stringPtr("2023-02-01T17:12:25Z"),
+			GrossYield:    0.166667,
+			MadeVisibleAt: stringPtr("2023-02-01T17:12:25Z"),
 		},
-
 		{
-			ID:                      82,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "London",
-			PropertyType:            "terraced_house",
-			Bedrooms:                3,
-			Bathrooms:               3,
-			SizeSqFt:                600,
-			PriceInCents:            100000000,
-			MinimumDepositInCents:   20000000,
-			EstimatedDepositInCents: 40827520,
-			RentalIncomeInCents:     850000,
-			IsTenanted:              false,
-			IsCashOnly:              false,
-			Description:             "Image test",
+			ID: 82,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "3 Knotting Lane",
+				AddressLine2:      "",
+				City:              "London",
+				Postcode:          "W14 9AA",
+				ShortenedPostcode: "W14",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeTerraced,
+			Bedrooms:                   3,
+			Bathrooms:                  3,
+			SizeSqFt:                   300,
+			PriceInCents:               100000000,
+			MinimumDepositInCents:      20000000,
+			EstimatedDepositInCents:    40827520,
+			MonthlyRentalIncomeInCents: 850000,
+			IsTenanted:                 false,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Image test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/58e9d12f-95fd-4516-9611-cc6f4c828959",
@@ -354,31 +407,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.102,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     true,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-02-02T08:36:00Z"),
+			GrossYield:    0.102,
+			MadeVisibleAt: stringPtr("2023-02-02T08:36:00Z"),
 		},
 		{
-			ID:                      68,
-			DevelopmentName:         nil,
-			PostTown:                "Sheffield",
-			ShortenedPostCode:       "S1",
-			Region:                  "North East",
-			PropertyType:            "apartment",
-			Bedrooms:                1,
-			Bathrooms:               1,
-			SizeSqFt:                301,
-			PriceInCents:            13875000,
-			MinimumDepositInCents:   3468700,
-			EstimatedDepositInCents: 3468750,
-			RentalIncomeInCents:     95100,
-			IsTenanted:              true,
-			IsCashOnly:              true,
-			Description:             "This property can be purchased via shares with 0% SDLT - this purchase option is only available with GetGround! \n\nWhen you buy shares, you usually pay stamp duty tax of 0.5% on the price you pay for the claims. As the property continues to be owned by the company no SDLT is payable.\n\nThis modern studio apartment is ideal for young professionals in the heart of Sheffield city centre. This flat is already tenanted generating a strong 8.2% yield for investors to benefit from. The rent is assured until the end of Q2 2025.\n\nBeing just a 10-minute walk from Sheffield Sheaf Street, you have fantastic access to all of the North's city hubs, with Manchester, Birmingham and Leeds all just a one-hour train journey away.",
+			ID: 68,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "27 Hill Road",
+				AddressLine2:      "",
+				City:              "Sheffield",
+				Postcode:          "S1 2AB",
+				ShortenedPostcode: "S1",
+				Country:           "UK",
+				Region:            RegionNorthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  1,
+			SizeSqFt:                   301,
+			PriceInCents:               13875000,
+			MinimumDepositInCents:      3468700,
+			EstimatedDepositInCents:    3468750,
+			MonthlyRentalIncomeInCents: 95100,
+			IsTenanted:                 true,
+			IsCashOnly:                 true,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "This property can be purchased via shares with 0% SDLT - this purchase option is only available with GetGround! \n\nWhen you buy shares, you usually pay stamp duty tax of 0.5% on the price you pay for the claims. As the property continues to be owned by the company no SDLT is payable.\n\nThis modern studio apartment is ideal for young professionals in the heart of Sheffield city centre. This flat is already tenanted generating a strong 8.2% yield for investors to benefit from. The rent is assured until the end of Q2 2025.\n\nBeing just a 10-minute walk from Sheffield Sheaf Street, you have fantastic access to all of the North's city hubs, with Manchester, Birmingham and Leeds all just a one-hour train journey away.",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/48d16039-5857-471e-a8ee-d427441e2604",
@@ -405,31 +461,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.0822487,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-09-27T08:14:37Z"),
+			GrossYield:    0.0822486,
+			MadeVisibleAt: stringPtr("2023-09-27T08:14:37Z"),
 		},
 		{
-			ID:                      66,
-			DevelopmentName:         nil,
-			PostTown:                "Preston",
-			ShortenedPostCode:       "PR1",
-			Region:                  "North West",
-			PropertyType:            "apartment",
-			Bedrooms:                2,
-			Bathrooms:               1,
-			SizeSqFt:                686,
-			PriceInCents:            3995000,
-			MinimumDepositInCents:   3995000,
-			EstimatedDepositInCents: 998750,
-			RentalIncomeInCents:     38000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "2 bed flat in Preston with a rear terrace space and large garden area.",
+			ID: 66,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "67 Kansas Street",
+				AddressLine2:      "",
+				City:              "Preston",
+				Postcode:          "PR1 2TT",
+				ShortenedPostcode: "PR1",
+				Country:           "UK",
+				Region:            RegionNorthWest,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   2,
+			Bathrooms:                  1,
+			SizeSqFt:                   686,
+			PriceInCents:               3995000,
+			MinimumDepositInCents:      3995000,
+			EstimatedDepositInCents:    998750,
+			MonthlyRentalIncomeInCents: 38000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "2 bed flat in Preston with a rear terrace space and large garden area.",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/5d4d5076-2cf3-4d09-8818-6a8fe0993530",
@@ -456,31 +515,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.114143,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-01-25T15:50:34Z"),
+			GrossYield:    0.114143,
+			MadeVisibleAt: stringPtr("2023-01-25T15:50:34Z"),
 		},
 		{
-			ID:                      71,
-			DevelopmentName:         nil,
-			PostTown:                "Preston",
-			ShortenedPostCode:       "PR1",
-			Region:                  "North West",
-			PropertyType:            "apartment",
-			Bedrooms:                3,
-			Bathrooms:               1,
-			SizeSqFt:                840,
-			PriceInCents:            88058000,
-			MinimumDepositInCents:   7014500,
-			EstimatedDepositInCents: 42397020,
-			RentalIncomeInCents:     875400,
-			IsTenanted:              false,
-			IsCashOnly:              false,
-			Description:             "Apt 170 sits on the eleventh floor and provides a great investment opportunity into a high specification apartment in a prime location that has been identified by local and national government as an area of great potential and has been extremely well funded in recent years. ",
+			ID: 71,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "45 Larcher Street",
+				AddressLine2:      "",
+				City:              "Preston",
+				Postcode:          "PR1 2AF",
+				ShortenedPostcode: "PR1",
+				Country:           "UK",
+				Region:            RegionNorthWest,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   3,
+			Bathrooms:                  1,
+			SizeSqFt:                   840,
+			PriceInCents:               88058000,
+			MinimumDepositInCents:      7014500,
+			EstimatedDepositInCents:    42397020,
+			MonthlyRentalIncomeInCents: 875400,
+			IsTenanted:                 false,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Apt 170 sits on the eleventh floor and provides a great investment opportunity into a high specification apartment in a prime location that has been identified by local and national government as an area of great potential and has been extremely well funded in recent years. ",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/26e7679c-5ba9-4c9c-ba54-858b400e6863",
@@ -507,31 +569,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.119294,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-01-25T16:11:54Z"),
+			GrossYield:    0.119294,
+			MadeVisibleAt: stringPtr("2023-01-25T16:11:54Z"),
 		},
 		{
-			ID:                      72,
-			DevelopmentName:         nil,
-			PostTown:                "Preston",
-			ShortenedPostCode:       "11",
-			Region:                  "North West",
-			PropertyType:            "apartment",
-			Bedrooms:                2,
-			Bathrooms:               1,
-			SizeSqFt:                678,
-			PriceInCents:            22429100,
-			MinimumDepositInCents:   5607300,
-			EstimatedDepositInCents: 9514036,
-			RentalIncomeInCents:     140200,
-			IsTenanted:              false,
-			IsCashOnly:              false,
-			Description:             "Apt 53 situated in Block B is a high specification apartment that sits on the third floor. The development itself encompasses a beautiful roof garden, residents lounge, concierge service, bike storage and a state of the art gym to complete this premium home in a well invested area, resulting in a rapidly developing cultural and economic landscape. \n\n\nTEST",
+			ID: 72,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "3 Button Street",
+				AddressLine2:      "",
+				City:              "Preston",
+				Postcode:          "PR1 2AF",
+				ShortenedPostcode: "PR1",
+				Country:           "UK",
+				Region:            RegionNorthWest,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   2,
+			Bathrooms:                  1,
+			SizeSqFt:                   678,
+			PriceInCents:               22429100,
+			MinimumDepositInCents:      5607300,
+			EstimatedDepositInCents:    9514036,
+			MonthlyRentalIncomeInCents: 140200,
+			IsTenanted:                 false,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Apt 53 situated in Block B is a high specification apartment that sits on the third floor. The development itself encompasses a beautiful roof garden, residents lounge, concierge service, bike storage and a state of the art gym to complete this premium home in a well invested area, resulting in a rapidly developing cultural and economic landscape. \n\n\nTEST",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/5f3758df-98cb-427a-84f2-afc7ea6c40ca",
@@ -552,31 +617,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.0750097,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-02-17T18:20:03Z"),
+			GrossYield:    0.0750097,
+			MadeVisibleAt: stringPtr("2023-02-17T18:20:03Z"),
 		},
 		{
-			ID:                      105,
-			DevelopmentName:         nil,
-			PostTown:                "Wallington",
-			ShortenedPostCode:       "SM6",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                286,
-			PriceInCents:            52500000,
-			MinimumDepositInCents:   2500000,
-			EstimatedDepositInCents: 13125000,
-			RentalIncomeInCents:     350000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "ertggr rtg trtg etgtrgrt",
+			ID: 105,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "4 High Street",
+				AddressLine2:      "",
+				City:              "Wallington",
+				Postcode:          "SM6 9AA",
+				ShortenedPostcode: "SM6",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   286,
+			PriceInCents:               52500000,
+			MinimumDepositInCents:      2500000,
+			EstimatedDepositInCents:    13125000,
+			MonthlyRentalIncomeInCents: 350000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                true,
+			Description:                "ertggr rtg trtg etgtrgrt",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/fa320e9c-cb0b-4c0d-be21-2b992ee6c126",
@@ -585,31 +653,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.08,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-01T13:39:00Z"),
+			GrossYield:    0.08,
+			MadeVisibleAt: stringPtr("2023-03-01T13:39:00Z"),
 		},
 		{
-			ID:                      106,
-			DevelopmentName:         nil,
-			PostTown:                "UPDATE",
-			ShortenedPostCode:       "UPDATE",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               2,
-			SizeSqFt:                123,
-			PriceInCents:            12300,
-			MinimumDepositInCents:   12300,
-			EstimatedDepositInCents: 3075,
-			RentalIncomeInCents:     12300,
-			IsTenanted:              true,
-			IsCashOnly:              true,
-			Description:             "UPDATE",
+			ID: 106,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "13 Cliff st",
+				AddressLine2:      "",
+				City:              "Dover",
+				Postcode:          "",
+				ShortenedPostcode: "DOV",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  2,
+			SizeSqFt:                   123,
+			PriceInCents:               12300000,
+			MinimumDepositInCents:      1230000,
+			EstimatedDepositInCents:    1500000,
+			MonthlyRentalIncomeInCents: 80000,
+			IsTenanted:                 true,
+			IsCashOnly:                 true,
+			IsNewBuild:                 false,
+			IsCompany:                  true,
+			IsShareSale:                true,
+			Description:                "UPDATE",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/9db6de1b-88b9-4030-b944-bd15544a23ed",
@@ -624,31 +695,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              12,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      true,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.0780488,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      120,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                77,
-			PriceInCents:            100000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 25000000,
-			RentalIncomeInCents:     700000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "test",
+			ID: 120,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "77 Regata Street",
+				AddressLine2:      "",
+				City:              "Henley",
+				Postcode:          "RE1 1AA",
+				ShortenedPostcode: "RE1",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   400,
+			PriceInCents:               100000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    25000000,
+			MonthlyRentalIncomeInCents: 700000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/86f3dadf-54bf-447c-a4fa-a8f067cf6aee",
@@ -657,31 +731,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.084,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-16T16:11:14Z"),
+			GrossYield:    0.084,
+			MadeVisibleAt: stringPtr("2023-03-16T16:11:14Z"),
 		},
 		{
-			ID:                      91,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                77,
-			PriceInCents:            100000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 25000000,
-			RentalIncomeInCents:     700000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+			ID: 91,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "Animal Farm",
+				AddressLine2:      "",
+				City:              "Eastbourne",
+				Postcode:          "BN20 1AA",
+				ShortenedPostcode: "BN20",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   789,
+			PriceInCents:               100000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    25000000,
+			MonthlyRentalIncomeInCents: 700000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/8816708f-9d0d-4c24-bac9-dad96fef53f4",
@@ -690,31 +767,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.084,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-02-17T17:47:45Z"),
+			GrossYield:    0.084,
+			MadeVisibleAt: stringPtr("2023-02-17T17:47:45Z"),
 		},
 		{
-			ID:                      94,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "NW1",
-			Region:                  "South East London",
-			PropertyType:            "apartment",
-			Bedrooms:                2,
-			Bathrooms:               3,
-			SizeSqFt:                1000,
-			PriceInCents:            125000,
-			MinimumDepositInCents:   10000,
-			EstimatedDepositInCents: 31250,
-			RentalIncomeInCents:     1100,
-			IsTenanted:              false,
-			IsCashOnly:              true,
-			Description:             "Free text",
+			ID: 94,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "12 Alfie Solomons Way",
+				AddressLine2:      "",
+				City:              "London",
+				Postcode:          "N1 8LN",
+				ShortenedPostcode: "N1",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   2,
+			Bathrooms:                  3,
+			SizeSqFt:                   1000,
+			PriceInCents:               125000,
+			MinimumDepositInCents:      10000,
+			EstimatedDepositInCents:    31250,
+			MonthlyRentalIncomeInCents: 1100,
+			IsTenanted:                 false,
+			IsCashOnly:                 true,
+			IsNewBuild:                 false,
+			IsCompany:                  true,
+			IsShareSale:                true,
+			Description:                "Free text",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/bea385af-17c5-4369-bf94-be6b9570f4db",
@@ -723,31 +803,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.1056,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      true,
-			MadeVisibleAt:           stringPtr("2023-02-20T09:57:55Z"),
+			GrossYield:    0.1056,
+			MadeVisibleAt: stringPtr("2023-02-20T09:57:55Z"),
 		},
 		{
-			ID:                      97,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                0,
-			PriceInCents:            100,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 25,
-			RentalIncomeInCents:     400000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "0",
+			ID: 97,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "123 Rainbow Road",
+				AddressLine2:      "",
+				City:              "Brighton",
+				Postcode:          "BN1 1AA",
+				ShortenedPostcode: "BN1",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   678,
+			PriceInCents:               50000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    12000000,
+			MonthlyRentalIncomeInCents: 400000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "0",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/c836d323-7548-47fd-82e8-f1529c87e51e",
@@ -756,31 +839,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              48000,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.096,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      103,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                300,
-			PriceInCents:            100000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 25000000,
-			RentalIncomeInCents:     4000000,
-			IsTenanted:              true,
-			IsCashOnly:              true,
-			Description:             "66666",
+			ID: 103,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "4 Seaside Road",
+				AddressLine2:      "",
+				City:              "Whitstable",
+				Postcode:          "CT5 1AB",
+				ShortenedPostcode: "CT5",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   300,
+			PriceInCents:               100000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    12000000,
+			MonthlyRentalIncomeInCents: 100000,
+			IsTenanted:                 true,
+			IsCashOnly:                 true,
+			IsNewBuild:                 false,
+			IsCompany:                  true,
+			IsShareSale:                false,
+			Description:                "66666",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/533f2688-23c2-4385-a272-0179f9d6b6db",
@@ -789,31 +875,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              true,
-			GrossYield:              0.48,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      true,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.012,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      143,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                40,
-			PriceInCents:            20000000,
-			MinimumDepositInCents:   3000000,
-			EstimatedDepositInCents: 5000000,
-			RentalIncomeInCents:     400000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "Test ",
+			ID: 143,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "3 Chaucer Road",
+				AddressLine2:      "",
+				City:              "Canterbury",
+				Postcode:          "CT1 3RF",
+				ShortenedPostcode: "CT1",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   750,
+			PriceInCents:               20000000,
+			MinimumDepositInCents:      300000,
+			EstimatedDepositInCents:    500000,
+			MonthlyRentalIncomeInCents: 150000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Test ",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/3a458a51-532c-456a-8814-5d488cac49f0",
@@ -822,31 +911,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.24,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-27T11:01:38Z"),
+			GrossYield:    0.09,
+			MadeVisibleAt: stringPtr("2023-03-27T11:01:38Z"),
 		},
 		{
-			ID:                      144,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                40,
-			PriceInCents:            20000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 5000000,
-			RentalIncomeInCents:     400000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "Test",
+			ID: 144,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "115 Maidstone Road",
+				AddressLine2:      "",
+				City:              "Maidstone",
+				Postcode:          "ME15 6AA",
+				ShortenedPostcode: "MDS",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   40,
+			PriceInCents:               15000000,
+			MinimumDepositInCents:      1000000,
+			EstimatedDepositInCents:    1500000,
+			MonthlyRentalIncomeInCents: 40000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/0ee871a1-ecb8-43c7-aab0-30128baec351",
@@ -855,31 +947,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.24,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-27T11:04:16Z"),
+			GrossYield:    0.032,
+			MadeVisibleAt: stringPtr("2023-03-27T11:04:16Z"),
 		},
 		{
-			ID:                      148,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "East of England",
-			PropertyType:            "terraced_house",
-			Bedrooms:                3,
-			Bathrooms:               1,
-			SizeSqFt:                32,
-			PriceInCents:            35000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 8750000,
-			RentalIncomeInCents:     400000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "test",
+			ID: 148,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "3 Buckingham Palace Road",
+				AddressLine2:      "",
+				City:              "London",
+				Postcode:          "",
+				ShortenedPostcode: "W14 8FF",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeTerraced,
+			Bedrooms:                   3,
+			Bathrooms:                  1,
+			SizeSqFt:                   32,
+			PriceInCents:               35000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    8750000,
+			MonthlyRentalIncomeInCents: 400000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "test",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/70c29877-0654-49ed-8225-3189e81b7354",
@@ -888,31 +983,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.137143,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-28T13:30:27Z"),
+			GrossYield:    0.137143,
+			MadeVisibleAt: stringPtr("2023-03-28T13:30:27Z"),
 		},
 		{
-			ID:                      145,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W14",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                0,
-			Bathrooms:               1,
-			SizeSqFt:                40,
-			PriceInCents:            25000000,
-			MinimumDepositInCents:   10000000,
-			EstimatedDepositInCents: 6250000,
-			RentalIncomeInCents:     400000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "Test visible (ON)",
+			ID: 145,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "123 Main street",
+				AddressLine2:      "W14 9AA",
+				City:              "London",
+				Postcode:          "",
+				ShortenedPostcode: "W14",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   0,
+			Bathrooms:                  1,
+			SizeSqFt:                   40,
+			PriceInCents:               25000000,
+			MinimumDepositInCents:      10000000,
+			EstimatedDepositInCents:    6250000,
+			MonthlyRentalIncomeInCents: 400000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Classic house right on main street!",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/b73ac33d-b2de-4656-a92e-a7f4bde98b26",
@@ -921,31 +1019,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.192,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           stringPtr("2023-03-27T12:36:10Z"),
+			GrossYield:    0.192,
+			MadeVisibleAt: stringPtr("2023-03-27T12:36:10Z"),
 		},
 		{
-			ID:                      178,
-			DevelopmentName:         nil,
-			PostTown:                "Spooky City",
-			ShortenedPostCode:       "HA110",
-			Region:                  "London",
-			PropertyType:            "terraced_house",
-			Bedrooms:                3,
-			Bathrooms:               3,
-			SizeSqFt:                200,
-			PriceInCents:            9999900,
-			MinimumDepositInCents:   99999900,
-			EstimatedDepositInCents: 2499975,
-			RentalIncomeInCents:     999900,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "Boo! You've found our ghost listing for this Halloween season. You might have fallen for our trick, but using our buy-to-let marketplace is a treat. Scroll through our properties for some scarily good yields.",
+			ID: 178,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "331 High street",
+				AddressLine2:      "",
+				City:              "Spooky City",
+				Postcode:          "",
+				ShortenedPostcode: "SW2",
+				Country:           "UK",
+				Region:            RegionLondon,
+			},
+			PropertyType:               PropertyTypeTerraced,
+			Bedrooms:                   3,
+			Bathrooms:                  3,
+			SizeSqFt:                   200,
+			PriceInCents:               9999900,
+			MinimumDepositInCents:      999900,
+			EstimatedDepositInCents:    1050000,
+			MonthlyRentalIncomeInCents: 99900,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  true,
+			IsShareSale:                true,
+			Description:                "Boo! You've found our ghost listing for this Halloween season. You might have fallen for our trick, but using our buy-to-let marketplace is a treat. Scroll through our properties for some scarily good yields.",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/ab08a0af-0a78-4244-8f9e-985a517c85b4",
@@ -972,31 +1073,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              1.19989,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             true,
-			IsGetgroundCompany:      true,
-			MadeVisibleAt:           stringPtr("2023-10-13T13:15:07Z"),
+			GrossYield:    0.119988,
+			MadeVisibleAt: stringPtr("2023-10-13T13:15:07Z"),
 		},
 		{
-			ID:                      183,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "W8",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                1,
-			Bathrooms:               1,
-			SizeSqFt:                1234,
-			PriceInCents:            10000000,
-			MinimumDepositInCents:   2500000,
-			EstimatedDepositInCents: 2500000,
-			RentalIncomeInCents:     150000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "asdf",
+			ID: 183,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "1 Maidstone Road",
+				AddressLine2:      "",
+				City:              "Maidstone",
+				Postcode:          "ME15 6AA",
+				ShortenedPostcode: "ME15",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  1,
+			SizeSqFt:                   1234,
+			PriceInCents:               10000000,
+			MinimumDepositInCents:      2500000,
+			EstimatedDepositInCents:    2500000,
+			MonthlyRentalIncomeInCents: 150000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Apartment in central Maidstone",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/2889f267-fd95-43fd-8745-45e4e02f1e59",
@@ -1005,31 +1109,34 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/jpeg",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              0.18,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.18,
+			MadeVisibleAt: nil,
 		},
 		{
-			ID:                      181,
-			DevelopmentName:         nil,
-			PostTown:                "London",
-			ShortenedPostCode:       "SW18",
-			Region:                  "South East",
-			PropertyType:            "apartment",
-			Bedrooms:                1,
-			Bathrooms:               1,
-			SizeSqFt:                566,
-			PriceInCents:            455500,
-			MinimumDepositInCents:   5000000,
-			EstimatedDepositInCents: 113875,
-			RentalIncomeInCents:     200000,
-			IsTenanted:              true,
-			IsCashOnly:              false,
-			Description:             "ghjk",
+			ID: 181,
+			AddressDetails: AddressDetails{
+				AddressLine1:      "5 Canterbury Road",
+				AddressLine2:      "",
+				City:              "Cantebury",
+				Postcode:          "CT1 1AA",
+				ShortenedPostcode: "CT1",
+				Country:           "UK",
+				Region:            RegionSouthEast,
+			},
+			PropertyType:               PropertyTypeApartment,
+			Bedrooms:                   1,
+			Bathrooms:                  1,
+			SizeSqFt:                   566,
+			PriceInCents:               25000000,
+			MinimumDepositInCents:      5000000,
+			EstimatedDepositInCents:    6500000,
+			MonthlyRentalIncomeInCents: 150000,
+			IsTenanted:                 true,
+			IsCashOnly:                 false,
+			IsNewBuild:                 false,
+			IsCompany:                  false,
+			IsShareSale:                false,
+			Description:                "Very slick apartment in Canterbury",
 			Photos: []Photo{
 				{
 					OriginalURL:  "https://storage.googleapis.com/assets-terranova-qa-module-core/listings/6306344f-423f-4e67-be20-207bdb11eed8",
@@ -1038,13 +1145,8 @@ func (r *ListingRepositoryImpl) addSampleData() {
 					MimeType:     "image/png",
 				},
 			},
-			IsFeatured:              false,
-			GrossYield:              5.26894,
-			HasUserRequestedContact: false,
-			HasUserSavedListing:     false,
-			IsShareSale:             false,
-			IsGetgroundCompany:      false,
-			MadeVisibleAt:           nil,
+			GrossYield:    0.072,
+			MadeVisibleAt: nil,
 		},
 	}
 
@@ -1066,13 +1168,13 @@ func (r *ListingRepositoryImpl) Create(ctx context.Context, listing *Listing) er
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if listing.PostTown == "" {
-		return errors.New("post town is required")
+	if listing.AddressDetails.City == "" {
+		return errors.New("city is required")
 	}
-	if listing.ShortenedPostCode == "" {
-		return errors.New("shortened post code is required")
+	if listing.AddressDetails.ShortenedPostcode == "" {
+		return errors.New("shortened postcode is required")
 	}
-	if listing.Region == "" {
+	if listing.AddressDetails.Region == "" {
 		return errors.New("region is required")
 	}
 	if listing.PropertyType == "" {
@@ -1119,13 +1221,13 @@ func (r *ListingRepositoryImpl) Update(ctx context.Context, listing *Listing) er
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if listing.PostTown == "" {
-		return errors.New("post town is required")
+	if listing.AddressDetails.City == "" {
+		return errors.New("city is required")
 	}
-	if listing.ShortenedPostCode == "" {
-		return errors.New("shortened post code is required")
+	if listing.AddressDetails.ShortenedPostcode == "" {
+		return errors.New("shortened postcode is required")
 	}
-	if listing.Region == "" {
+	if listing.AddressDetails.Region == "" {
 		return errors.New("region is required")
 	}
 	if listing.PropertyType == "" {
@@ -1166,7 +1268,7 @@ func (r *ListingRepositoryImpl) GetByRegion(ctx context.Context, region string) 
 	defer r.mu.RUnlock()
 	listings := make([]*Listing, 0)
 	for _, listing := range r.data {
-		if listing.Region == region {
+		if string(listing.AddressDetails.Region) == region {
 			listings = append(listings, listing)
 		}
 	}
@@ -1179,34 +1281,32 @@ func (r *ListingRepositoryImpl) GetByPropertyType(ctx context.Context, propertyT
 	defer r.mu.RUnlock()
 	listings := make([]*Listing, 0)
 	for _, listing := range r.data {
-		if listing.PropertyType == propertyType {
+		if string(listing.PropertyType) == propertyType {
 			listings = append(listings, listing)
 		}
 	}
 	return listings, nil
 }
 
-// GetFeatured retrieves all featured listings
+// GetFeatured retrieves all featured listings (deprecated - returns all listings)
 func (r *ListingRepositoryImpl) GetFeatured(ctx context.Context) ([]*Listing, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	listings := make([]*Listing, 0)
 	for _, listing := range r.data {
-		if listing.IsFeatured {
-			listings = append(listings, listing)
-		}
+		listings = append(listings, listing)
 	}
 	return listings, nil
 }
 
-// SearchByCity searches listings by city (post town)
+// SearchByCity searches listings by city
 func (r *ListingRepositoryImpl) SearchByCity(ctx context.Context, city string) ([]*Listing, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	listings := make([]*Listing, 0)
 	cityLower := strings.ToLower(city)
 	for _, listing := range r.data {
-		if strings.Contains(strings.ToLower(listing.PostTown), cityLower) {
+		if strings.Contains(strings.ToLower(listing.AddressDetails.City), cityLower) {
 			listings = append(listings, listing)
 		}
 	}
